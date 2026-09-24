@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MarketPulse – Product Sales & Market Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F2F3F5;
+  --card:#FFFFFF;
+  --ink:#0F2233;
+  --ink-soft:#6B7280;
+  --line:#E4E7EB;
+  --brand:#0F2747;
+  --brand-2:#0F8B8D;
+  --brand-tint:#E1F2F1;
+  --good:#3A8256;
+  --good-tint:#E9F3EC;
+  --warn:#B7791F;
+  --warn-tint:#FBF1E1;
+  --bad:#B14B3B;
+  --bad-tint:#FBEAE7;
+  --radius:9px;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  padding-top:env(safe-area-inset-top,0px);
+  -webkit-font-smoothing:antialiased;
+}
+.container{max-width:1180px;margin:0 auto;padding:0 24px;}
+
+/* ---- top nav ---- */
+header.nav{
+  background:var(--brand);
+  border-bottom:3px solid #081A30;
+  position:sticky; top:0; z-index:40;
+  padding-top:env(safe-area-inset-top,0px);
+}
+.nav-inner{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 24px; max-width:1180px; margin:0 auto; gap:20px;
+}
+.brand{display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none;}
+.brand-mark{
+  width:32px;height:32px;border-radius:7px;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--brand); font-weight:800; font-size:15px;
+}
+.brand-text{font-weight:700; font-size:17px; letter-spacing:.1px;}
+.brand-sub{font-size:11px; color:#BFE0EA; font-weight:500; margin-top:-1px;}
+nav.links{display:flex; gap:2px; flex-wrap:wrap;}
+nav.links button{
+  display:inline-flex; align-items:center; gap:6px;
+  background:none;border:none;color:#B9CAD6;font-family:inherit;
+  font-size:13.5px; font-weight:500; padding:9px 13px; border-radius:20px;
+  cursor:pointer; transition:background .12s,color .12s;
+}
+.nav-ico{font-size:13px; line-height:1;}
+nav.links button:hover{background:rgba(255,255,255,.08); color:#fff;}
+nav.links button.active{background:var(--brand-2); color:#fff; font-weight:600;}
+.nav-utils{display:flex; align-items:center; gap:14px; flex-shrink:0;}
+.nav-bell{position:relative; font-size:16px; color:#CFE0E8; cursor:pointer;}
+.nav-dot{position:absolute; top:-2px; right:-3px; width:7px; height:7px; border-radius:50%; background:#E5534B; border:1.5px solid var(--brand);}
+.nav-avatar{
+  width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center; font-size:14px;
+}
+
+/* ---- layout ---- */
+.shell{display:flex; align-items:flex-start;}
+.sidebar{
+  width:82px; flex-shrink:0; background:var(--brand); min-height:calc(100vh - 62px);
+  display:flex; flex-direction:column; align-items:center; gap:4px; padding:22px 8px;
+  position:sticky; top:62px;
+}
+.side-btn{
+  width:100%; background:none; border:none; color:#9FB5C4; font-family:inherit;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  padding:11px 4px; border-radius:9px; cursor:pointer; font-size:11px; font-weight:500;
+  transition:background .12s, color .12s;
+}
+.side-btn .side-ico{font-size:17px;}
+.side-btn:hover{background:rgba(255,255,255,.07); color:#fff;}
+.side-btn.active{background:var(--brand-2); color:#fff;}
+.side-footer{margin-top:auto; text-align:center; padding-top:18px; border-top:1px solid rgba(255,255,255,.12); width:100%;}
+.side-footer .side-ico{font-size:18px; display:block; margin-bottom:6px;}
+.side-footer p{margin:0; font-size:9.5px; line-height:1.4; color:#7C93A3; font-style:italic;}
+main{padding:28px 0 60px; flex:1; min-width:0;}
+.page{display:none;}
+.page.active{display:block;}
+.page-head{margin-bottom:20px;}
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; background:var(--card);
+  border:1px solid var(--line); border-radius:7px; padding:7px 13px;
+  font-family:inherit; font-size:13px; font-weight:600; color:var(--brand);
+  cursor:pointer; margin-bottom:14px; box-shadow:var(--shadow);
+  transition:background .12s, border-color .12s;
+}
+.back-btn:hover{background:var(--brand-tint); border-color:var(--brand-2);}
+#dashboard .page-head h1{color:#0F2747;}
+.hero{
+  display:flex; align-items:center; gap:22px; margin:20px 0 22px;
+  background:linear-gradient(120deg, #DCF0EF 0%, #E9F4F6 55%, #EDF6F7 100%);
+  border:1px solid #CDE7E5; border-radius:12px; padding:22px 26px; overflow:hidden;
+}
+.hero-icon{
+  width:78px; height:78px; flex-shrink:0; border-radius:50%; background:#fff;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(16,24,40,.10);
+}
+.hero-illus-wrap{
+  flex-shrink:0; background:#fff; border-radius:12px; padding:14px 18px;
+  box-shadow:0 2px 8px rgba(16,24,40,.08);
+}
+.hero-mid{flex:1; min-width:220px;}
+.hero-eyebrow{font-size:11.5px; font-weight:700; letter-spacing:1px; color:var(--brand-2); text-transform:uppercase;}
+.hero-title{margin:2px 0 4px; font-size:34px; font-weight:800; letter-spacing:-.5px; color:var(--brand);}
+.hero-title .teal{color:var(--brand-2);}
+.hero-sub{margin:0 0 10px; font-size:14.5px; color:#3A5566; font-weight:500;}
+.hero-tagline{font-size:12.5px; color:#4E6B78; font-style:italic; display:flex; gap:10px;}
+.hero-tagline span{font-style:normal; color:#B9D3D2;}
+.hero-illus{flex-shrink:0;}
+@media (max-width:820px){.hero-illus{display:none;} .hero{padding:20px;}}
+.page-head h1{font-size:21px; margin:0 0 4px; font-weight:700;}
+.page-head p{margin:0; color:var(--ink-soft); font-size:14px;}
+
+/* ---- cards ---- */
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:18px 20px;
+}
+.card h3{margin:0 0 14px; font-size:14px; font-weight:600; color:var(--ink);}
+.card h3 .muted{font-weight:400; color:var(--ink-soft); font-size:12.5px;}
+
+.quick-links{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px;}
+@media (max-width:820px){.quick-links{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.quick-links{grid-template-columns:1fr;}}
+.ql-btn{
+  display:flex; align-items:center; gap:13px;
+  background:var(--accent-tint, var(--brand-tint)); border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:var(--shadow); padding:14px 14px; cursor:pointer; text-align:left;
+  font-family:inherit; transition:transform .1s, box-shadow .12s;
+}
+.ql-btn:hover{transform:translateY(-2px); box-shadow:0 4px 10px rgba(16,24,40,.09);}
+.ql-btn .ql-ico{
+  font-size:19px; flex-shrink:0; width:42px; height:42px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:#fff; color:var(--accent, var(--brand));
+}
+.ql-btn .ql-text{flex:1; display:flex; flex-direction:column; gap:2px;}
+.ql-btn .ql-title{font-size:14px; font-weight:700; color:var(--ink);}
+.ql-btn .ql-sub{font-size:11.5px; color:var(--ink-soft); font-weight:400;}
+.ql-btn .ql-chev{font-size:16px; color:var(--ink-soft); flex-shrink:0;}
+.ql-btn.c1{--accent:#0F2747; --accent-tint:#E4E8EE;}
+.ql-btn.c2{--accent:#0F8B8D; --accent-tint:#E1F2F1;}
+.ql-btn.c3{--accent:#3A8256; --accent-tint:#E9F3EC;}
+.ql-btn.c4{--accent:#8B5E34; --accent-tint:#F3EBE1;}
+.ql-btn.c5{--accent:#B7791F; --accent-tint:#FBF1E1;}
+.ql-btn.c6{--accent:#B14B3B; --accent-tint:#FBEAE7;}
+
+.grid-4{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;}
+.grid-2{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:20px;}
+.grid-2b{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;}
+@media (max-width:900px){
+  .grid-4{grid-template-columns:repeat(2,1fr);}
+  .grid-2, .grid-2b{grid-template-columns:1fr;}
+}
+
+/* ---- kpi ---- */
+.grid-2b.kpis{grid-template-columns:repeat(2,1fr);}
+.kpi{display:flex; align-items:center; gap:14px;}
+.kpi .kpi-ico{
+  width:46px; height:46px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:19px;
+  background:var(--accent-tint); color:var(--accent);
+}
+.kpi .kpi-mid{flex:1; min-width:0;}
+.kpi .label{font-size:12.5px; color:var(--ink-soft); font-weight:500; margin-bottom:4px;}
+.kpi .value{font-size:23px; font-weight:700; letter-spacing:-.2px;}
+.kpi .delta{font-size:12px; margin-top:4px; font-weight:500;}
+.kpi .kpi-spark{width:100px; height:40px; flex-shrink:0;}
+.delta.up{color:var(--good);}
+.delta.down{color:var(--bad);}
+.kpi.k1{--accent:#3A8256; --accent-tint:#E9F3EC;}
+.kpi.k2{--accent:#2C5A8C; --accent-tint:#E7EDF4;}
+.kpi.k3{--accent:#0F8B8D; --accent-tint:#E1F2F1;}
+.kpi.k4{--accent:#B7791F; --accent-tint:#FBF1E1;}
+
+/* ---- table ---- */
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
+th{
+  text-align:left; font-size:11.5px; color:var(--ink-soft); font-weight:600;
+  padding:9px 10px; border-bottom:1px solid var(--line);
+}
+td{padding:10px 10px; border-bottom:1px solid #EEF0F2; color:var(--ink);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#FAFBFC;}
+td.num, th.num{text-align:right; font-variant-numeric:tabular-nums;}
+.tag{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11.5px; font-weight:600;}
+.tag.low{background:var(--bad-tint); color:var(--bad);}
+.tag.mod{background:var(--warn-tint); color:var(--warn);}
+.tag.high, .tag.good{background:var(--good-tint); color:var(--good);}
+
+.chart-wrap{position:relative; height:260px;}
+.chart-wrap.sm{height:210px;}
+
+/* ---- opportunity cards ---- */
+.opp-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:22px;}
+@media (max-width:900px){.opp-grid{grid-template-columns:repeat(2,1fr);}}
+.opp-card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:14px 15px; box-shadow:var(--shadow); cursor:pointer; transition:border-color .12s;
+}
+.opp-card:hover{border-color:var(--brand-2);}
+.opp-card.focus{border-color:var(--warn); box-shadow:0 0 0 1px var(--warn), var(--shadow);}
+.opp-card .area{font-weight:700; font-size:14.5px; margin-bottom:8px;}
+.opp-card .row{display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; color:var(--ink-soft);}
+
+.spotlight{
+  background:linear-gradient(180deg,#FFFFFF, #FFFDF9);
+  border:1px solid #EAD9B4; border-left:4px solid var(--warn);
+  border-radius:var(--radius); padding:22px 24px; box-shadow:var(--shadow);
+}
+.spotlight-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:8px;}
+.spotlight-top h2{margin:0; font-size:18px; font-weight:700;}
+.pill{background:var(--warn-tint); color:var(--warn); font-size:12px; font-weight:600; padding:4px 11px; border-radius:20px;}
+.metric-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px;}
+@media (max-width:800px){.metric-row{grid-template-columns:repeat(2,1fr);}}
+.metric-box{background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px 14px;}
+.metric-box .k{font-size:11.5px; color:var(--ink-soft); margin-bottom:5px; font-weight:500;}
+.metric-box .v{font-size:13.5px; font-weight:600;}
+.action-box{background:var(--brand-tint); border:1px solid #BFE4E3; border-radius:8px; padding:14px 16px;}
+.action-box .k{font-size:11.5px; color:var(--brand); font-weight:700; margin-bottom:5px; letter-spacing:.2px;}
+.action-box p{margin:0; font-size:14px; line-height:1.5; color:#1B3B47;}
+
+.footer-note{margin-top:34px; padding-top:16px; border-top:1px solid var(--line); font-size:12px; color:var(--ink-soft); text-align:center;}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#">
+      <span class="brand-mark">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="13" width="3.4" height="8" rx="0.8" fill="#0F2747"/>
+          <rect x="8.3" y="9" width="3.4" height="12" rx="0.8" fill="#0F2747"/>
+          <rect x="13.6" y="5" width="3.4" height="16" rx="0.8" fill="#0F8B8D"/>
+          <rect x="18.9" y="10.5" width="3.4" height="10.5" rx="0.8" fill="#0F8B8D"/>
+          <path d="M2.5 8.2 L9 5.6 L14 9.3 L21.5 3" stroke="#0F2747" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M17.3 3 L21.5 3 L21.5 7.2" stroke="#0F2747" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </span>
+      <span>
+        <div class="brand-text">MarketPulse</div>
+        <div class="brand-sub">Product Sales &amp; Market Intelligence</div>
+      </span>
+    </a>
+    <nav class="links" id="navLinks">
+      <button data-page="dashboard" class="active"><span class="nav-ico">▦</span>Dashboard</button>
+      <button data-page="sales"><span class="nav-ico">📈</span>Sales Analysis</button>
+      <button data-page="profit"><span class="nav-ico">◔</span>Profit Analysis</button>
+      <button data-page="wholesale"><span class="nav-ico">📦</span>Wholesale Analysis</button>
+      <button data-page="feedback"><span class="nav-ico">👥</span>Customer Feedback</button>
+      <button data-page="opportunities"><span class="nav-ico">🎯</span>Market Opportunities</button>
+    </nav>
+    <div class="nav-utils">
+      <span class="nav-bell">🔔<span class="nav-dot"></span></span>
+      <span class="nav-avatar">👤</span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="sidebar">
+    <button class="side-btn active" onclick="goToPage('dashboard')">
+      <span class="side-ico">🏠</span><span>Home</span>
+    </button>
+    <button class="side-btn"><span class="side-ico">📄</span><span>Reports</span></button>
+    <button class="side-btn"><span class="side-ico">📶</span><span>Analytics</span></button>
+    <button class="side-btn"><span class="side-ico">⚙️</span><span>Settings</span></button>
+    <div class="side-footer">
+      <span class="side-ico">📈</span>
+      <p>Better Insights<br>Bigger Opportunities</p>
+    </div>
+  </aside>
+
+<main class="container">
+
+  <!-- DASHBOARD -->
+  <section class="page active" id="dashboard">
+
+    <div class="hero">
+      <div class="hero-icon">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M26 4 A22 22 0 1 0 26 48" stroke="#0F2747" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+          <path d="M26 4 A22 22 0 0 1 44.5 36" stroke="#0F8B8D" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+          <rect x="14" y="26" width="3.6" height="12" rx="1" fill="#0F2747"/>
+          <rect x="20.5" y="20" width="3.6" height="18" rx="1" fill="#0F2747"/>
+          <rect x="27" y="15" width="3.6" height="23" rx="1" fill="#0F8B8D"/>
+          <path d="M13 22 L21 15.5 L28 21 L37 10" stroke="#0F8B8D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M31 10 L37 10 L37 16" stroke="#0F8B8D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="hero-mid">
+        <div class="hero-eyebrow">Welcome to</div>
+        <h1 class="hero-title"><span>Market</span><span class="teal">Pulse</span></h1>
+        <p class="hero-sub">Product Sales &amp; Market Intelligence Platform</p>
+        <div class="hero-tagline">Smarter Insights<span>|</span>Better Decisions<span>|</span>Greater Growth</div>
+      </div>
+      <div class="hero-illus-wrap">
+      <svg class="hero-illus" width="220" height="90" viewBox="0 0 220 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#0F8B8D" stroke-width="3" stroke-linecap="round">
+          <line x1="8" y1="58" x2="8" y2="72"/><line x1="22" y1="46" x2="22" y2="70"/>
+          <line x1="36" y1="52" x2="36" y2="68"/><line x1="50" y1="36" x2="50" y2="62"/>
+          <line x1="64" y1="40" x2="64" y2="60"/><line x1="78" y1="26" x2="78" y2="54"/>
+        </g>
+        <path d="M4 74 L40 50 L70 58 L130 18" stroke="#0F2747" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M112 18 L130 18 L130 34" stroke="#0F2747" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="182" cy="48" r="34" fill="#0F2747" opacity=".9"/>
+        <g stroke="#CFE6E5" stroke-width="1">
+          <ellipse cx="182" cy="48" rx="34" ry="14" fill="none"/>
+          <ellipse cx="182" cy="48" rx="14" ry="34" fill="none"/>
+          <line x1="148" y1="48" x2="216" y2="48"/>
+        </g>
+      </svg>
+      </div>
+    </div>
+
+    <div class="page-head">
+      <h1>Overview</h1>
+      <p>Consolidated performance across 5 coverage areas · Quarter to date</p>
+    </div>
+
+    <div class="quick-links" id="quickLinks">
+      <button data-page="dashboard" class="ql-btn c1"><span class="ql-ico">📊</span><span class="ql-text"><span class="ql-title">Dashboard</span><span class="ql-sub">Overview</span></span><span class="ql-chev">›</span></button>
+      <button data-page="sales" class="ql-btn c2"><span class="ql-ico">📈</span><span class="ql-text"><span class="ql-title">Sales Analysis</span><span class="ql-sub">Units &amp; revenue</span></span><span class="ql-chev">›</span></button>
+      <button data-page="profit" class="ql-btn c3"><span class="ql-ico">💰</span><span class="ql-text"><span class="ql-title">Profit Analysis</span><span class="ql-sub">Margins by area</span></span><span class="ql-chev">›</span></button>
+      <button data-page="wholesale" class="ql-btn c4"><span class="ql-ico">📦</span><span class="ql-text"><span class="ql-title">Wholesale Analysis</span><span class="ql-sub">Distributor demand</span></span><span class="ql-chev">›</span></button>
+      <button data-page="feedback" class="ql-btn c5"><span class="ql-ico">⭐</span><span class="ql-text"><span class="ql-title">Customer Feedback</span><span class="ql-sub">Ratings &amp; themes</span></span><span class="ql-chev">›</span></button>
+      <button data-page="opportunities" class="ql-btn c6"><span class="ql-ico">🎯</span><span class="ql-text"><span class="ql-title">Market Opportunities</span><span class="ql-sub">Growth areas</span></span><span class="ql-chev">›</span></button>
+    </div>
+
+    <div class="grid-2b kpis">
+      <div class="card kpi k1"><span class="kpi-ico">₹</span><div class="kpi-mid"><div class="label">Total Revenue</div><div class="value">₹8.25 L</div><div class="delta up">▲ 6.1% vs last quarter</div></div><div class="kpi-spark"><canvas id="spRevenue"></canvas></div></div>
+      <div class="card kpi k2"><span class="kpi-ico">📊</span><div class="kpi-mid"><div class="label">Total Profit</div><div class="value">₹2.95 L</div><div class="delta up">▲ 4.4% vs last quarter</div></div><div class="kpi-spark"><canvas id="spProfit"></canvas></div></div>
+      <div class="card kpi k3"><span class="kpi-ico">📦</span><div class="kpi-mid"><div class="label">Units Sold</div><div class="value">8,450</div><div class="delta up">▲ 3.8% vs last quarter</div></div><div class="kpi-spark"><canvas id="spUnits"></canvas></div></div>
+      <div class="card kpi k4"><span class="kpi-ico">⭐</span><div class="kpi-mid"><div class="label">Avg. Customer Rating</div><div class="value">4.2 / 5</div><div class="delta down">▼ 0.1 vs last quarter</div></div><div class="kpi-spark"><canvas id="spRating"></canvas></div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card"><h3>Revenue by area <span class="muted">₹ in lakhs</span></h3>
+        <div class="chart-wrap"><canvas id="chDashRevenue"></canvas></div>
+      </div>
+      <div class="card"><h3>Monthly revenue trend <span class="muted">last 6 months</span></h3>
+        <div class="chart-wrap"><canvas id="chDashTrend"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Area-wise performance summary</h3>
+      <table>
+        <thead><tr><th>Area</th><th class="num">Revenue (₹L)</th><th class="num">Profit (₹L)</th><th class="num">Units Sold</th><th class="num">Rating</th><th>Trend</th></tr></thead>
+        <tbody>
+          <tr><td>Hyderabad</td><td class="num">3.10</td><td class="num">1.15</td><td class="num">3,200</td><td class="num">4.5</td><td><span class="tag high">Growing</span></td></tr>
+          <tr><td>Vijayawada</td><td class="num">1.85</td><td class="num">0.68</td><td class="num">1,950</td><td class="num">4.3</td><td><span class="tag high">Growing</span></td></tr>
+          <tr><td>Visakhapatnam</td><td class="num">1.65</td><td class="num">0.60</td><td class="num">1,680</td><td class="num">4.2</td><td><span class="tag mod">Stable</span></td></tr>
+          <tr><td>Warangal</td><td class="num">1.05</td><td class="num">0.35</td><td class="num">1,020</td><td class="num">4.1</td><td><span class="tag mod">Stable</span></td></tr>
+          <tr><td>Nellore</td><td class="num">0.60</td><td class="num">0.17</td><td class="num">600</td><td class="num">3.9</td><td><span class="tag low">Needs attention</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SALES -->
+  <section class="page" id="sales">
+    <button class="back-btn" onclick="goToPage('dashboard')">← Back</button>
+    <div class="page-head"><h1>Sales Analysis</h1><p>Unit sales and revenue movement across areas and time</p></div>
+    <div class="grid-2">
+      <div class="card"><h3>Monthly units sold</h3><div class="chart-wrap"><canvas id="chSalesUnits"></canvas></div></div>
+      <div class="card"><h3>Revenue split by area</h3><div class="chart-wrap"><canvas id="chSalesSplit"></canvas></div></div>
+    </div>
+    <div class="card">
+      <h3>Sales detail by area</h3>
+      <table>
+        <thead><tr><th>Area</th><th class="num">Units Sold</th><th class="num">Revenue (₹L)</th><th class="num">Avg. Order Value (₹)</th><th class="num">Repeat Buyers</th></tr></thead>
+        <tbody>
+          <tr><td>Hyderabad</td><td class="num">3,200</td><td class="num">3.10</td><td class="num">969</td><td class="num">42%</td></tr>
+          <tr><td>Vijayawada</td><td class="num">1,950</td><td class="num">1.85</td><td class="num">949</td><td class="num">38%</td></tr>
+          <tr><td>Visakhapatnam</td><td class="num">1,680</td><td class="num">1.65</td><td class="num">982</td><td class="num">35%</td></tr>
+          <tr><td>Warangal</td><td class="num">1,020</td><td class="num">1.05</td><td class="num">1,029</td><td class="num">31%</td></tr>
+          <tr><td>Nellore</td><td class="num">600</td><td class="num">0.60</td><td class="num">1,000</td><td class="num">22%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PROFIT -->
+  <section class="page" id="profit">
+    <button class="back-btn" onclick="goToPage('dashboard')">← Back</button>
+    <div class="page-head"><h1>Profit Analysis</h1><p>Margins and profitability by area</p></div>
+    <div class="grid-2">
+      <div class="card"><h3>Profit by area <span class="muted">₹ in lakhs</span></h3><div class="chart-wrap"><canvas id="chProfitArea"></canvas></div></div>
+      <div class="card"><h3>Profit margin trend</h3><div class="chart-wrap"><canvas id="chProfitTrend"></canvas></div></div>
+    </div>
+    <div class="card">
+      <h3>Margin breakdown</h3>
+      <table>
+        <thead><tr><th>Area</th><th class="num">Revenue (₹L)</th><th class="num">Cost (₹L)</th><th class="num">Profit (₹L)</th><th class="num">Margin %</th></tr></thead>
+        <tbody>
+          <tr><td>Hyderabad</td><td class="num">3.10</td><td class="num">1.95</td><td class="num">1.15</td><td class="num">37.1%</td></tr>
+          <tr><td>Vijayawada</td><td class="num">1.85</td><td class="num">1.17</td><td class="num">0.68</td><td class="num">36.8%</td></tr>
+          <tr><td>Visakhapatnam</td><td class="num">1.65</td><td class="num">1.05</td><td class="num">0.60</td><td class="num">36.4%</td></tr>
+          <tr><td>Warangal</td><td class="num">1.05</td><td class="num">0.70</td><td class="num">0.35</td><td class="num">33.3%</td></tr>
+          <tr><td>Nellore</td><td class="num">0.60</td><td class="num">0.43</td><td class="num">0.17</td><td class="num">28.3%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WHOLESALE -->
+  <section class="page" id="wholesale">
+    <button class="back-btn" onclick="goToPage('dashboard')">← Back</button>
+    <div class="page-head"><h1>Wholesale Analysis</h1><p>Distributor demand and bulk order patterns</p></div>
+    <div class="grid-2">
+      <div class="card"><h3>Wholesale orders by area</h3><div class="chart-wrap"><canvas id="chWholesaleOrders"></canvas></div></div>
+      <div class="card"><h3>Wholesale demand level</h3><div class="chart-wrap"><canvas id="chWholesaleDemand"></canvas></div></div>
+    </div>
+    <div class="card">
+      <h3>Distributor activity</h3>
+      <table>
+        <thead><tr><th>Area</th><th class="num">Active Distributors</th><th class="num">Bulk Orders / Month</th><th class="num">Avg. Order Size (units)</th><th>Demand</th></tr></thead>
+        <tbody>
+          <tr><td>Hyderabad</td><td class="num">14</td><td class="num">58</td><td class="num">62</td><td><span class="tag high">High</span></td></tr>
+          <tr><td>Vijayawada</td><td class="num">9</td><td class="num">37</td><td class="num">55</td><td><span class="tag high">High</span></td></tr>
+          <tr><td>Visakhapatnam</td><td class="num">8</td><td class="num">31</td><td class="num">54</td><td><span class="tag mod">Moderate</span></td></tr>
+          <tr><td>Warangal</td><td class="num">5</td><td class="num">19</td><td class="num">48</td><td><span class="tag mod">Moderate</span></td></tr>
+          <tr><td>Nellore</td><td class="num">3</td><td class="num">11</td><td class="num">45</td><td><span class="tag mod">Moderate</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section class="page" id="feedback">
+    <button class="back-btn" onclick="goToPage('dashboard')">← Back</button>
+    <div class="page-head"><h1>Customer Feedback</h1><p>Ratings and comment themes collected from buyers</p></div>
+    <div class="grid-2">
+      <div class="card"><h3>Rating by area</h3><div class="chart-wrap"><canvas id="chFeedbackRating"></canvas></div></div>
+      <div class="card"><h3>Rating distribution <span class="muted">all responses</span></h3><div class="chart-wrap"><canvas id="chFeedbackDist"></canvas></div></div>
+    </div>
+    <div class="card">
+      <h3>Recent feedback themes</h3>
+      <table>
+        <thead><tr><th>Area</th><th class="num">Rating</th><th>Common Theme</th><th>Sentiment</th></tr></thead>
+        <tbody>
+          <tr><td>Hyderabad</td><td class="num">4.5</td><td>Fast delivery, good packaging</td><td><span class="tag good">Positive</span></td></tr>
+          <tr><td>Vijayawada</td><td class="num">4.3</td><td>Consistent quality</td><td><span class="tag good">Positive</span></td></tr>
+          <tr><td>Visakhapatnam</td><td class="num">4.2</td><td>Price slightly high for size</td><td><span class="tag mod">Mixed</span></td></tr>
+          <tr><td>Warangal</td><td class="num">4.1</td><td>Limited variety in stores</td><td><span class="tag mod">Mixed</span></td></tr>
+          <tr><td>Nellore</td><td class="num">3.9</td><td>Availability concerns, stock-outs</td><td><span class="tag low">Needs attention</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- OPPORTUNITIES -->
+  <section class="page" id="opportunities">
+    <button class="back-btn" onclick="goToPage('dashboard')">← Back</button>
+    <div class="page-head"><h1>Market Opportunities</h1><p>Areas ranked by growth potential based on sales, reach, feedback and wholesale signals</p></div>
+
+    <div class="opp-grid" id="oppGrid"></div>
+
+    <div class="spotlight">
+      <div class="spotlight-top">
+        <h2>Nellore — Market Opportunity</h2>
+        <span class="pill">Priority focus area</span>
+      </div>
+      <div class="metric-row">
+        <div class="metric-box"><div class="k">Sales</div><div class="v">Low</div></div>
+        <div class="metric-box"><div class="k">Product Reach</div><div class="v">Low</div></div>
+        <div class="metric-box"><div class="k">Customer Feedback</div><div class="v">Availability concerns</div></div>
+        <div class="metric-box"><div class="k">Wholesale Demand</div><div class="v">Moderate</div></div>
+      </div>
+      <div class="action-box">
+        <div class="k">SUGGESTED ACTION</div>
+        <p>Improve distributor coverage and increase local product awareness. Wholesale demand is already moderate, which suggests retailers are willing to stock the product — the gap is in consistent supply and visibility rather than customer interest.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">MarketPulse — Product Sales &amp; Market Intelligence Platform · Prototype build for academic demonstration · Data shown is illustrative</div>
+</main>
+</div>
+
+<script>
+// ---- nav ----
+const buttons = document.querySelectorAll('#navLinks button');
+function goToPage(name){
+  buttons.forEach(x=>x.classList.toggle('active', x.dataset.page===name));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+}
+buttons.forEach(b=>b.addEventListener('click',()=>goToPage(b.dataset.page)));
+document.querySelectorAll('#quickLinks .ql-btn').forEach(b=>b.addEventListener('click',()=>goToPage(b.dataset.page)));
+
+// ---- shared style ----
+Chart.defaults.font.family = "'Inter',system-ui,sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6B7280';
+const areas = ['Hyderabad','Vijayawada','Visakhapatnam','Warangal','Nellore'];
+const brandBar = ['#0F2747','#0F8B8D','#4FA8A9','#8FC6C6','#C9E3E2'];
+const good='#3A8256', warn='#B7791F', bad='#B14B3B';
+function grid(){return {color:'#EEF0F2'};}
+
+// KPI sparklines
+function sparkline(id,data,color){
+  new Chart(document.getElementById(id),{
+    type:'line',
+    data:{labels:data.map((_,i)=>i), datasets:[{data, borderColor:color, backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{enabled:false}}, scales:{x:{display:false}, y:{display:false}}}
+  });
+}
+sparkline('spRevenue',[1.05,1.12,1.08,1.21,1.28,1.35,1.31,1.44,1.66],'#3A8256');
+sparkline('spProfit',[0.38,0.40,0.39,0.44,0.47,0.49,0.46,0.52,0.61],'#2C5A8C');
+sparkline('spUnits',[1180,1220,1195,1260,1340,1390,1310,1470,1680],'#0F8B8D');
+sparkline('spRating',[4.3,4.3,4.2,4.2,4.3,4.1,4.2,4.1,4.2],'#B7791F');
+
+// Dashboard: revenue by area
+new Chart(document.getElementById('chDashRevenue'),{
+  type:'bar',
+  data:{labels:areas, datasets:[{data:[3.10,1.85,1.65,1.05,0.60], backgroundColor:'#0F8B8D', borderRadius:4, maxBarThickness:42}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, grid:grid()}, x:{grid:{display:false}}}}
+});
+
+// Dashboard: monthly trend
+new Chart(document.getElementById('chDashTrend'),{
+  type:'line',
+  data:{labels:['Apr','May','Jun','Jul','Aug','Sep'],
+    datasets:[{label:'Revenue (₹L)', data:[1.21,1.28,1.35,1.31,1.44,1.66], borderColor:'#0F2747', backgroundColor:'rgba(15,39,71,.08)', fill:true, tension:.35, pointRadius:3}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{grid:grid()}, x:{grid:{display:false}}}}
+});
+
+// Sales: units by month
+new Chart(document.getElementById('chSalesUnits'),{
+  type:'bar',
+  data:{labels:['Apr','May','Jun','Jul','Aug','Sep'],
+    datasets:[{label:'Units', data:[1260,1340,1390,1310,1470,1680], backgroundColor:'#0F8B8D', borderRadius:4}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{grid:grid()}, x:{grid:{display:false}}}}
+});
+
+// Sales: revenue split doughnut
+new Chart(document.getElementById('chSalesSplit'),{
+  type:'doughnut',
+  data:{labels:areas, datasets:[{data:[3.10,1.85,1.65,1.05,0.60], backgroundColor:brandBar, borderWidth:2, borderColor:'#fff'}]},
+  options:{plugins:{legend:{position:'right', labels:{boxWidth:10, padding:12}}}, cutout:'62%'}
+});
+
+// Profit by area
+new Chart(document.getElementById('chProfitArea'),{
+  type:'bar',
+  data:{labels:areas, datasets:[{data:[1.15,0.68,0.60,0.35,0.17], backgroundColor:good, borderRadius:4, maxBarThickness:42}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, grid:grid()}, x:{grid:{display:false}}}}
+});
+
+// Profit margin trend
+new Chart(document.getElementById('chProfitTrend'),{
+  type:'line',
+  data:{labels:['Apr','May','Jun','Jul','Aug','Sep'],
+    datasets:[{label:'Margin %', data:[34.2,35.0,35.8,34.9,36.1,36.6], borderColor:good, backgroundColor:'rgba(58,130,86,.08)', fill:true, tension:.35, pointRadius:3}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{grid:grid()}, x:{grid:{display:false}}}}
+});
+
+// Wholesale orders
+new Chart(document.getElementById('chWholesaleOrders'),{
+  type:'bar',
+  data:{labels:areas, datasets:[{data:[58,37,31,19,11], backgroundColor:'#0F2747', borderRadius:4, maxBarThickness:42}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, grid:grid()}, x:{grid:{display:false}}}}
+});
+
+// Wholesale demand radar-ish -> use bar of avg order size
+new Chart(document.getElementById('chWholesaleDemand'),{
+  type:'bar',
+  data:{labels:areas, datasets:[{label:'Avg order size (units)', data:[62,55,54,48,45], backgroundColor:'#8FBFCF', borderRadius:4, maxBarThickness:42}]},
+  options:{indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true, grid:grid()}, y:{grid:{display:false}}}}
+});
+
+// Feedback rating by area
+new Chart(document.getElementById('chFeedbackRating'),{
+  type:'bar',
+  data:{labels:areas, datasets:[{data:[4.5,4.3,4.2,4.1,3.9], backgroundColor:['#3A8256','#3A8256','#3A8256','#B7791F','#B14B3B'], borderRadius:4, maxBarThickness:42}]},
+  options:{plugins:{legend:{display:false}}, scales:{y:{min:0,max:5, grid:grid()}, x:{grid:{display:false}}}}
+});
+
+// Feedback distribution
+new Chart(document.getElementById('chFeedbackDist'),{
+  type:'doughnut',
+  data:{labels:['5 star','4 star','3 star','2 star','1 star'],
+    datasets:[{data:[38,41,14,5,2], backgroundColor:['#3A8256','#6FA98A','#C9D9DE','#D8A15C','#B14B3B'], borderWidth:2, borderColor:'#fff'}]},
+  options:{plugins:{legend:{position:'right', labels:{boxWidth:10, padding:12}}}, cutout:'62%'}
+});
+
+// Opportunity cards
+const opp = [
+  {area:'Hyderabad', sales:'High', reach:'High', wholesale:'High'},
+  {area:'Vijayawada', sales:'Moderate', reach:'Moderate', wholesale:'High'},
+  {area:'Visakhapatnam', sales:'Moderate', reach:'Moderate', wholesale:'Moderate'},
+  {area:'Warangal', sales:'Low', reach:'Moderate', wholesale:'Moderate'},
+  {area:'Nellore', sales:'Low', reach:'Low', wholesale:'Moderate'},
+];
+function tagClass(v){ if(v==='High') return 'high'; if(v==='Moderate') return 'mod'; return 'low'; }
+const oppGrid = document.getElementById('oppGrid');
+opp.forEach(o=>{
+  const div = document.createElement('div');
+  div.className = 'opp-card' + (o.area==='Nellore' ? ' focus' : '');
+  div.innerHTML = `<div class="area">${o.area}</div>
+    <div class="row"><span>Sales</span><span class="tag ${tagClass(o.sales)}">${o.sales}</span></div>
+    <div class="row"><span>Reach</span><span class="tag ${tagClass(o.reach)}">${o.reach}</span></div>
+    <div class="row"><span>Wholesale</span><span class="tag ${tagClass(o.wholesale)}">${o.wholesale}</span></div>`;
+  oppGrid.appendChild(div);
+});
+</script>
+</body>
+</html>
